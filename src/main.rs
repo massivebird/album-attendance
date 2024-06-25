@@ -57,7 +57,14 @@ fn sorted_track_numbers(album: ReadDir) -> Vec<u32> {
             _ => continue,
         };
 
-        let track_number = track_name.to_string_lossy()[..2].parse::<u32>().unwrap();
+        let track_number = track_name
+            .to_string_lossy()
+            .chars()
+            .take_while(|c| c.is_numeric())
+            .collect::<String>()
+            .parse::<u32>()
+            .unwrap();
+
         track_numbers.push(track_number);
     }
 
