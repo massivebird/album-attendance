@@ -23,21 +23,31 @@ fn main() {
             $path
                 .filter_map(Result::ok)
                 .filter(|d| d.file_type().unwrap().is_dir())
-                .map(|d| std::fs::read_dir(d.path()))
-                .filter_map(Result::ok)
+                .map(|d| (d.file_name(), std::fs::read_dir(d.path())))
         };
     }
 
-    for artist in only_ok_directories_in!(root) {
-        for album in only_ok_directories_in!(artist) {
+    for (_, artist) in only_ok_directories_in!(root) {
+        for (album_name, album_path) in only_ok_directories_in!(artist.unwrap()) {
             {
-                let track_numbers = compile_track_numbers(album);
+                let track_numbers = sorted_track_numbers(album_path.unwrap());
+
+                for n in 1..*track_numbers.last().unwrap() {
+                    if track_numbers.contains(&n) {
+                        continue;
+                    }
+
+                    println!(
+                        "Album {} missing track number {n:02}",
+                        album_name.to_string_lossy()
+                    );
+                }
             }
         }
     }
 }
 
-fn compile_track_numbers(album: ReadDir) -> Vec<u32> {
+fn sorted_track_numbers(album: ReadDir) -> Vec<u32> {
     let mut track_numbers: Vec<u32> = Vec::new();
 
     for file in album.filter_map(Result::ok) {
@@ -51,5 +61,6 @@ fn compile_track_numbers(album: ReadDir) -> Vec<u32> {
         track_numbers.push(track_number);
     }
 
+    track_numbers.sort_unstable();
     track_numbers
 }
