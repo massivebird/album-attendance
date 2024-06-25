@@ -10,7 +10,7 @@ This is only intended for libraries that represent:
 
 + Artists as directories in the root
 + Albums as subdirectories
-+ Songs as normal files in albums, with the track number in the filename's first two characters
++ Songs as normal files in albums, prefixed with the track number
   + eg: `"02 - Oneohtrix Point Never - Describing Bodies".mp3`
 
 ## Usage
