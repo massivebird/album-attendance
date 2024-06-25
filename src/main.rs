@@ -27,7 +27,7 @@ fn main() {
         };
     }
 
-    for (_, artist) in only_ok_directories_in!(root) {
+    for (artist_name, artist) in only_ok_directories_in!(root) {
         for (album_name, album_path) in only_ok_directories_in!(artist.unwrap()) {
             {
                 let track_numbers = sorted_track_numbers(album_path.unwrap());
@@ -38,7 +38,8 @@ fn main() {
                     }
 
                     println!(
-                        "Album {} missing track number {n:02}",
+                        "{}'s {} is missing track number {n:02}",
+                        artist_name.to_string_lossy(),
                         album_name.to_string_lossy()
                     );
                 }
