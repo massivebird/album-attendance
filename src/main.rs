@@ -32,7 +32,7 @@ fn main() {
             {
                 let track_numbers = sorted_track_numbers(album_path.unwrap());
 
-                for n in 1..*track_numbers.last().unwrap() {
+                for n in 1..*track_numbers.last().unwrap_or(&0) {
                     if track_numbers.contains(&n) {
                         continue;
                     }
@@ -57,13 +57,15 @@ fn sorted_track_numbers(album: ReadDir) -> Vec<u32> {
             _ => continue,
         };
 
-        let track_number = track_name
+        let Ok(track_number) = track_name
             .to_string_lossy()
             .chars()
             .take_while(|c| c.is_numeric())
             .collect::<String>()
             .parse::<u32>()
-            .unwrap();
+        else {
+            continue;
+        };
 
         track_numbers.push(track_number);
     }
