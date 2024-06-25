@@ -18,20 +18,21 @@ fn main() {
         std::fs::read_dir(path).expect("Failed to open specified directory")
     };
 
-    for file in root
-        .filter_map(Result::ok)
-        .filter(|d| d.file_type().unwrap().is_dir())
-    {
-        // ignore non-directories
-        let artist = std::fs::read_dir(file.path()).unwrap();
+    macro_rules! only_ok_directories_in {
+        ( $path: expr) => {
+            $path
+                .filter_map(Result::ok)
+                .filter(|d| d.file_type().unwrap().is_dir())
+                .map(|d| std::fs::read_dir(d.path()))
+                .filter_map(Result::ok)
+        };
+    }
 
-        for album in artist
-            .filter_map(Result::ok)
-            .filter(|d| d.file_type().unwrap().is_dir())
-            .filter_map(|d| Some(std::fs::read_dir(d.path())))
-            .filter_map(Result::ok)
-        {
-            let track_numbers = compile_track_numbers(album);
+    for artist in only_ok_directories_in!(root) {
+        for album in only_ok_directories_in!(artist) {
+            {
+                let track_numbers = compile_track_numbers(album);
+            }
         }
     }
 }
